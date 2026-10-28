@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from 'react';
+import type { Ionicons } from '@react-native-vector-icons/ionicons';
+import { ComponentProps, useSyncExternalStore } from 'react';
 
 // Simple in-memory store for the demo. Data resets when the app reloads.
 
@@ -6,6 +7,7 @@ export type TrackerItem = {
   id: string;
   label: string;
   unit: string;
+  icon: ComponentProps<typeof Ionicons>['name'];
 };
 
 export type Entry = {
@@ -17,12 +19,16 @@ export type Entry = {
 };
 
 export const ITEMS: TrackerItem[] = [
-  { id: 'water', label: 'Water', unit: 'glasses' },
-  { id: 'fruit', label: 'Fruit', unit: 'servings' },
-  { id: 'veggies', label: 'Veggies', unit: 'servings' },
-  { id: 'steps', label: 'Steps', unit: 'steps' },
-  { id: 'exercise', label: 'Exercise', unit: 'min' },
-  { id: 'sleep', label: 'Sleep', unit: 'hrs' },
+  { id: 'water', label: 'Water', unit: 'glasses', icon: 'water' },
+  { id: 'coffee', label: 'Coffee', unit: 'cups', icon: 'cafe' },
+  { id: 'fruit', label: 'Fruit', unit: 'servings', icon: 'nutrition' },
+  { id: 'veggies', label: 'Veggies', unit: 'servings', icon: 'leaf' },
+  { id: 'steps', label: 'Steps', unit: 'steps', icon: 'footsteps' },
+  { id: 'exercise', label: 'Exercise', unit: 'min', icon: 'barbell' },
+  { id: 'outdoors', label: 'Outdoors', unit: 'min', icon: 'sunny' },
+  { id: 'meditation', label: 'Meditation', unit: 'min', icon: 'flower' },
+  { id: 'reading', label: 'Reading', unit: 'pages', icon: 'book' },
+  { id: 'sleep', label: 'Sleep', unit: 'hrs', icon: 'bed' },
 ];
 
 export function getItem(id: string) {
@@ -120,10 +126,14 @@ export function getDayTotal(entries: Entry[], itemId: string, dateKey: string) {
 function seedEntries(): Entry[] {
   const seed: Record<string, number[]> = {
     water: [2, 3, 1],
+    coffee: [1, 1],
     fruit: [1, 2],
     veggies: [3],
     steps: [6400],
     exercise: [30],
+    outdoors: [20, 15],
+    meditation: [10],
+    reading: [25],
     sleep: [7.5],
   };
   const entries: Entry[] = [];

@@ -1,13 +1,15 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader } from '@/components/app-header';
+import { useTheme } from '@/hooks/use-theme';
 
 export default function SettingsScreen() {
+  const theme = useTheme();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.screen }]}>
       <AppHeader title="Settings" />
       <View style={styles.body}>
-        <Text style={styles.text}>Coming soon</Text>
+        <Text style={[styles.text, { color: theme.muted }]}>Coming soon</Text>
       </View>
     </View>
   );
@@ -16,7 +18,6 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F2F2F2',
   },
   body: {
     flex: 1,
@@ -25,6 +26,5 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    color: '#888888',
   },
 });

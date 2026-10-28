@@ -4,9 +4,8 @@ import { ComponentProps } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { useTheme } from '@/hooks/use-theme';
 import { changeDay, formatDateLabel, localDateKey, useTrackerState } from '@/lib/tracker';
-
-export const HeaderColor = '#2563EB';
 
 type AppHeaderProps = {
   title: string;
@@ -22,6 +21,7 @@ type IconButtonProps = {
 };
 
 function IconButton({ icon, onPress, disabled = false, accessibilityLabel }: IconButtonProps) {
+  const theme = useTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -30,7 +30,7 @@ function IconButton({ icon, onPress, disabled = false, accessibilityLabel }: Ico
       accessibilityLabel={accessibilityLabel}
       hitSlop={8}
       style={[styles.iconButton, disabled && styles.disabled]}>
-      <Ionicons name={icon} size={24} color="white" />
+      <Ionicons name={icon} size={24} color={theme.onHeader} />
     </Pressable>
   );
 }
@@ -38,18 +38,20 @@ function IconButton({ icon, onPress, disabled = false, accessibilityLabel }: Ico
 // A plain, hand-rolled header bar. Intentionally generic for the first version of the demo.
 export function AppHeader({ title, showBack = false, showDayNav = false }: AppHeaderProps) {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   const { selectedDate } = useTrackerState();
   const isToday = localDateKey(selectedDate) === localDateKey(new Date());
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View
+      style={[styles.container, { paddingTop: insets.top, backgroundColor: theme.header }]}>
       <View style={styles.navBar}>
         <View style={styles.side}>
           {showBack && (
             <IconButton icon="arrow-back" onPress={() => router.back()} accessibilityLabel="Back" />
           )}
         </View>
-        <Text style={styles.title} numberOfLines={1}>
+        <Text style={[styles.title, { color: theme.onHeader }]} numberOfLines={1}>
           {title}
         </Text>
         <View style={styles.side} />
@@ -62,7 +64,9 @@ export function AppHeader({ title, showBack = false, showDayNav = false }: AppHe
             onPress={() => changeDay(-1)}
             accessibilityLabel="Previous day"
           />
-          <Text style={styles.dayLabel}>{formatDateLabel(selectedDate)}</Text>
+          <Text style={[styles.dayLabel, { color: theme.onHeader }]}>
+            {formatDateLabel(selectedDate)}
+          </Text>
           <IconButton
             icon="chevron-forward"
             onPress={() => changeDay(1)}
@@ -77,7 +81,6 @@ export function AppHeader({ title, showBack = false, showDayNav = false }: AppHe
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: HeaderColor,
     paddingHorizontal: 4,
     paddingBottom: 8,
   },
@@ -98,7 +101,6 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    color: 'white',
     fontSize: 20,
     fontWeight: 'bold',
     textAlign: 'center',
@@ -112,7 +114,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   dayLabel: {
-    color: 'white',
     fontSize: 16,
   },
   disabled: {

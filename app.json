@@ -8,9 +8,11 @@
     "scheme": "cdmx2026demoapp",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.keithco.cdmx2026demoapp"
     },
     "android": {
+      "package": "com.keithco.cdmx2026demoapp",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -33,7 +35,35 @@
           "imageWidth": 76
         }
       ],
-      "@react-native-vector-icons/ionicons"
+      "@react-native-vector-icons/ionicons",
+      [
+        "expo-widgets",
+        {
+          "enableAndroid": true,
+          "widgets": [
+            {
+              "name": "HealthSnapshot",
+              "displayName": "Today's Health",
+              "description": "Your key trackers for today at a glance",
+              "ios": {
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium",
+                  "systemLarge"
+                ],
+                "initialLayout": "src/widgets/health-snapshot.ios.tsx"
+              },
+              "android": {
+                "targetCellWidth": 3,
+                "targetCellHeight": 3,
+                "initialLayout": "src/widgets/health-snapshot.android.tsx"
+              }
+            }
+          ]
+        }
+      ],
+      "expo-font",
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true,

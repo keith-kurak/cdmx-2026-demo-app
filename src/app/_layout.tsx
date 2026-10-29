@@ -7,6 +7,8 @@ import { StyleSheet, View, useColorScheme } from 'react-native';
 
 import { AnimatedSplashOverlay } from '@/components/animated-icon';
 import { useTheme } from '@/hooks/use-theme';
+import { useTrackerState } from '@/lib/tracker';
+import { syncHealthWidget } from '@/lib/widget-sync';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -23,6 +25,12 @@ export default function RootLayout() {
   useEffect(() => {
     SystemUI.setBackgroundColorAsync(theme.screen);
   }, [theme.screen]);
+
+  // Keep the home screen widget in sync with today's totals
+  const { items, entries } = useTrackerState();
+  useEffect(() => {
+    syncHealthWidget(items, entries);
+  }, [items, entries]);
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>

@@ -1,50 +1,20 @@
-import { Ionicons } from '@react-native-vector-icons/ionicons';
-import { Tabs } from 'expo-router/js-tabs';
-import { ComponentProps } from 'react';
-import { ColorValue } from 'react-native';
-
-import { useTheme } from '@/hooks/use-theme';
-
-function TabIcon({
-  name,
-  color,
-}: {
-  name: ComponentProps<typeof Ionicons>['name'];
-  color: ColorValue;
-}) {
-  return <Ionicons name={name} size={24} color={color} />;
-}
+import { NativeTabs } from 'expo-router/native-tabs';
 
 export default function TabsLayout() {
-  const theme = useTheme();
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: theme.accent,
-        tabBarInactiveTintColor: theme.muted,
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Tracker',
-          tabBarIcon: ({ color }) => <TabIcon name="list" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="trends"
-        options={{
-          title: 'Trends',
-          tabBarIcon: ({ color }) => <TabIcon name="bar-chart" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <TabIcon name="settings" color={color} />,
-        }}
-      />
-    </Tabs>
+    <NativeTabs>
+      <NativeTabs.Trigger name="index">
+        <NativeTabs.Trigger.Label>Tracker</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="list.bullet" md="list" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="trends">
+        <NativeTabs.Trigger.Label>Trends</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="chart.bar.fill" md="bar_chart" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="settings">
+        <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="gearshape.fill" md="settings" />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

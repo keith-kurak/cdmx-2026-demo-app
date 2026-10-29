@@ -1,5 +1,7 @@
 import type { Ionicons } from '@react-native-vector-icons/ionicons';
 import { ComponentProps, useSyncExternalStore } from 'react';
+import type { ImageSourcePropType } from 'react-native';
+import type { SFSymbol } from 'sf-symbols-typescript';
 
 // Simple in-memory store for the demo. Data resets when the app reloads.
 
@@ -7,7 +9,14 @@ export type TrackerItem = {
   id: string;
   label: string;
   unit: string;
+  // Icon color, readable in both light and dark mode
+  color: string;
+  // Ionicons glyph for web
   icon: ComponentProps<typeof Ionicons>['name'];
+  // SF Symbol for iOS
+  symbol: SFSymbol;
+  // Material Symbol XML drawable for Android
+  materialIcon: ImageSourcePropType;
 };
 
 export type Entry = {
@@ -18,21 +27,101 @@ export type Entry = {
   ts: number;
 };
 
-export const ITEMS: TrackerItem[] = [
-  { id: 'water', label: 'Water', unit: 'glasses', icon: 'water' },
-  { id: 'coffee', label: 'Coffee', unit: 'cups', icon: 'cafe' },
-  { id: 'fruit', label: 'Fruit', unit: 'servings', icon: 'nutrition' },
-  { id: 'veggies', label: 'Veggies', unit: 'servings', icon: 'leaf' },
-  { id: 'steps', label: 'Steps', unit: 'steps', icon: 'footsteps' },
-  { id: 'exercise', label: 'Exercise', unit: 'min', icon: 'barbell' },
-  { id: 'outdoors', label: 'Outdoors', unit: 'min', icon: 'sunny' },
-  { id: 'meditation', label: 'Meditation', unit: 'min', icon: 'flower' },
-  { id: 'reading', label: 'Reading', unit: 'pages', icon: 'book' },
-  { id: 'sleep', label: 'Sleep', unit: 'hrs', icon: 'bed' },
+const DEFAULT_ITEMS: TrackerItem[] = [
+  {
+    id: 'water',
+    label: 'Water',
+    unit: 'glasses',
+    color: '#0EA5E9',
+    icon: 'water',
+    symbol: 'drop.fill',
+    materialIcon: require('@expo/material-symbols/water_drop.xml'),
+  },
+  {
+    id: 'coffee',
+    label: 'Coffee',
+    unit: 'cups',
+    color: '#A16207',
+    icon: 'cafe',
+    symbol: 'cup.and.saucer.fill',
+    materialIcon: require('@expo/material-symbols/coffee.xml'),
+  },
+  {
+    id: 'fruit',
+    label: 'Fruit',
+    unit: 'servings',
+    color: '#EF4444',
+    icon: 'nutrition',
+    symbol: 'basket.fill',
+    materialIcon: require('@expo/material-symbols/nutrition.xml'),
+  },
+  {
+    id: 'veggies',
+    label: 'Veggies',
+    unit: 'servings',
+    color: '#22C55E',
+    icon: 'leaf',
+    symbol: 'leaf.fill',
+    materialIcon: require('@expo/material-symbols/eco.xml'),
+  },
+  {
+    id: 'steps',
+    label: 'Steps',
+    unit: 'steps',
+    color: '#F97316',
+    icon: 'footsteps',
+    symbol: 'figure.walk',
+    materialIcon: require('@expo/material-symbols/directions_walk.xml'),
+  },
+  {
+    id: 'exercise',
+    label: 'Exercise',
+    unit: 'min',
+    color: '#A855F7',
+    icon: 'barbell',
+    symbol: 'dumbbell.fill',
+    materialIcon: require('@expo/material-symbols/fitness_center.xml'),
+  },
+  {
+    id: 'outdoors',
+    label: 'Outdoors',
+    unit: 'min',
+    color: '#EAB308',
+    icon: 'sunny',
+    symbol: 'sun.max.fill',
+    materialIcon: require('@expo/material-symbols/sunny.xml'),
+  },
+  {
+    id: 'meditation',
+    label: 'Meditation',
+    unit: 'min',
+    color: '#14B8A6',
+    icon: 'flower',
+    symbol: 'figure.mind.and.body',
+    materialIcon: require('@expo/material-symbols/self_improvement.xml'),
+  },
+  {
+    id: 'reading',
+    label: 'Reading',
+    unit: 'pages',
+    color: '#EC4899',
+    icon: 'book',
+    symbol: 'book.fill',
+    materialIcon: require('@expo/material-symbols/menu_book.xml'),
+  },
+  {
+    id: 'sleep',
+    label: 'Sleep',
+    unit: 'hrs',
+    color: '#6366F1',
+    icon: 'bed',
+    symbol: 'bed.double.fill',
+    materialIcon: require('@expo/material-symbols/bed.xml'),
+  },
 ];
 
-export function getItem(id: string) {
-  return ITEMS.find((item) => item.id === id);
+export function getItem(items: TrackerItem[], id: string) {
+  return items.find((item) => item.id === id);
 }
 
 // --- Date utilities ---
@@ -66,6 +155,7 @@ export function formatTime(ts: number): string {
 
 type State = {
   selectedDate: Date;
+  items: TrackerItem[];
   entries: Entry[];
 };
 
@@ -76,7 +166,11 @@ function midnightToday() {
 }
 
 let nextId = 1;
-let state: State = { selectedDate: midnightToday(), entries: seedEntries() };
+let state: State = {
+  selectedDate: midnightToday(),
+  items: DEFAULT_ITEMS,
+  entries: seedEntries(),
+};
 const listeners = new Set<() => void>();
 
 function setState(update: Partial<State>) {
@@ -111,6 +205,26 @@ export function addEntry(itemId: string, value: number) {
 
 export function deleteEntry(id: number) {
   setState({ entries: state.entries.filter((e) => e.id !== id) });
+}
+
+export function deleteItems(ids: string[]) {
+  setState({
+    items: state.items.filter((item) => !ids.includes(item.id)),
+    entries: state.entries.filter((e) => !ids.includes(e.itemId)),
+  });
+}
+
+// Matches SwiftUI's onMove: `destination` is an index in the list before the move.
+export function moveItems(sourceIndices: number[], destination: number) {
+  const moving = sourceIndices.map((i) => state.items[i]);
+  const isMoving = (item: TrackerItem) => moving.includes(item);
+  setState({
+    items: [
+      ...state.items.slice(0, destination).filter((item) => !isMoving(item)),
+      ...moving,
+      ...state.items.slice(destination).filter((item) => !isMoving(item)),
+    ],
+  });
 }
 
 export function getEntriesForDay(entries: Entry[], itemId: string, dateKey: string) {

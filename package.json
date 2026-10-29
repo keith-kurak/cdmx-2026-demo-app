@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "dependencies": {
+    "@expo/material-symbols": "^0.1.1",
     "@expo/ui": "~58.0.24",
     "@react-native-vector-icons/ionicons": "^14.0.0",
     "expo": "~58.0.20",
@@ -36,6 +37,7 @@
   },
   "scripts": {
     "start": "expo start",
+    "start-windows": "EXPO_UNSTABLE_TUNNEL_V2=1 bunx expo start --tunnel",
     "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",

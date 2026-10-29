@@ -36,6 +36,7 @@
       },
       "devDependencies": {
         "@types/react": "~19.3.0",
+        "eas-simulator-evidence": "^0.2.4",
         "eslint": "^9.0.0",
         "eslint-config-expo": "~58.0.4",
         "typescript": "~6.0.3",
@@ -678,6 +679,8 @@
     "doctrine": ["doctrine@2.1.0", "", { "dependencies": { "esutils": "^2.0.2" } }, "sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw=="],
 
     "dunder-proto": ["dunder-proto@1.0.1", "", { "dependencies": { "call-bind-apply-helpers": "^1.0.1", "es-errors": "^1.3.0", "gopd": "^1.2.0" } }, "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A=="],
+
+    "eas-simulator-evidence": ["eas-simulator-evidence@0.2.4", "", { "bin": { "eas-simulator-evidence": "bin/eas-simulator-evidence.js" } }, "sha512-xR2e1TyKNwrUHME2K01IMuyTxsCMdi/mhlF6AxKgb7rKFBnY0FBmyfHXr1pTWZfRfhwJIZRbWxMygN37Eh4l0Q=="],
 
     "ee-first": ["ee-first@1.1.1", "", {}, "sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow=="],
 

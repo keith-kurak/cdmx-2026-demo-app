@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Shared settings and the bot comment shape. Source it; do not run it.
+#   APP_ID, APP_NAME, APP_SLUG             -> from brand.config.js
+#   CLAUDE_MODEL                           -> the model every agent runs on
+#   evidence_tool <cmd> [args...]         -> the eas-simulator-evidence CLI
+#   normalize_verdict "<line>" [FALLBACK] -> line 1 of a verdict file, made unambiguous
+#   verdict_badge "<verdict line>"        -> the line with a leading status emoji
+#   evidence_thumbs <dir> <site_url>      -> an HTML row of screenshot thumbnails
+# Every bot post shares one layout: "## 🤖 <stage>", a bold Verdict or
+# Status line, a short bullet list (PR, evidence), a thumbnail row, the
+# full report folded away, and a "_Posted by_" footer. The "## 🤖" prefix
+# is load-bearing: gh.mjs get-issue drops those comments so a re-triage
+# does not read the bot's own output as evidence.
+#
+# Adapted from jacobhammerle/employee-onboarding. @ref LLP 0009#where-it-came-from
+
+# app.json owns the app's identity, so read it instead of repeating the
+# bundle identifier here.
+APP_ID=$(node -p "require('./app.json').expo.ios.bundleIdentifier")
+APP_NAME=$(node -p "require('./app.json').expo.name")
+APP_SLUG=$(node -p "require('./app.json').expo.slug")
+CLAUDE_MODEL="${CLAUDE_MODEL:-claude-sonnet-5-5}"
+export APP_ID APP_NAME APP_SLUG CLAUDE_MODEL
+
+# --no-install: run the copy in node_modules and fail loudly when it is
+# missing, instead of fetching a floating version from the registry.
+evidence_tool() { npx --no-install eas-simulator-evidence "$@"; }
+
+# Line 1 of a verdict file decides the result, and agents do not always
+# write it cleanly ("PASS: FAIL: ..." was seen upstream). The package
+# collapses a chain of leading keywords to the LAST one, turns a PASS line
+# that still mentions FAIL into a FAIL, passes PASS / FAIL / REPLICATED /
+# NOT-REPLICATED / CONFIRMED / INCONCLUSIVE through unchanged, and makes
+# anything else "<fallback>: malformed verdict line: ...". <fallback> is
+# $2 (default FAIL; the issue flow passes INCONCLUSIVE).
+normalize_verdict() {
+  if [ -n "${2:-}" ]; then
+    evidence_tool verdict "$1" --fallback "$2"
+  else
+    evidence_tool verdict "$1"
+  fi
+}
+
+# The verdict keyword picks the emoji; the evidence site uses the same
+# mapping for its badge color.
+verdict_badge() { evidence_tool verdict "$1" --badge; }
+
+# Up to four screenshots from <dir>, in capture order, as linked
+# thumbnails served by the evidence site (files sit at the site root).
+# Prints nothing when there are no images, so callers can drop it in.
+evidence_thumbs() { evidence_tool thumbs "$1" "$2" --max 4; }
+
+# Boots an argent-type EAS Simulator session with BUILD_ID installed and
+# launched, waits for it, and exports ARGENT_TOOLS_URL, ARGENT_AUTH_TOKEN,
+# and UDID. $1 is the session name. tools/agent/sim-session.sh owns the
+# session logic, so CI and local development start sessions the same way.
+start_simulator_session() {
+  bash tools/agent/sim-session.sh start --name "$1" --build-id "$BUILD_ID" --tag expo-bot
+  eval "$(bash tools/agent/sim-session.sh env)"
+  echo "argent session device: $UDID"
+}
+
+# The appendix every simulator prompt gets: the identifiers the agent
+# needs in its argent commands.
+device_facts() {
+  printf '\nThe app bundle identifier is: %s\n' "$APP_ID"
+  printf 'The device udid for every argent command is: %s\n' "$UDID"
+}

@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx --yes qrcode-terminal:*)",
+      "Bash(EXPO_UNSTABLE_TUNNEL_V2=1 npx expo start --tunnel:*)"
+    ]
+  }
+}
